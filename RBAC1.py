@@ -42,19 +42,24 @@ user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
 # --- Create users and roles (only first time) ---
-@app.before_request
+
 def create_users():
     db.create_all()
-    if not user_datastore.find_role("admin"):
-        user_datastore.create_role(name="admin", description="Administrator")
-        user_datastore.create_role(name="editor", description="Content Editor")
-        user_datastore.create_role(name="viewer", description="Viewer")
-    if not user_datastore.find_user(email="admin@example.com"):
-        user_datastore.create_user(email="admin@example.com", password="adminpass", roles=["admin"])
-        user_datastore.create_user(email="editor@example.com", password="editorpass", roles=["editor"])
-        user_datastore.create_user(email="viewer@example.com", password="viewerpass", roles=["viewer"])
-    db.session.commit()
 
+    # create roles
+    for role_name in ['admin', 'editor', 'viewer']:
+        if not user_datastore.find_role(role_name):
+            user_datastore.create_role(name=role_name)
+
+    # create users
+    if not user_datastore.find_user(email='admin@example.com'):
+        user_datastore.create_user(email='admin@example.com', password='adminpass', roles=['admin'])
+    if not user_datastore.find_user(email='editor@example.com'):
+        user_datastore.create_user(email='editor@example.com', password='editorpass', roles=['editor'])
+    if not user_datastore.find_user(email='viewer@example.com'):
+        user_datastore.create_user(email='viewer@example.com', password='viewerpass', roles=['viewer'])
+
+    db.session.commit()
 # --- Role-based routes ---
 @app.route("/")
 def index():
@@ -85,4 +90,6 @@ def viewer_page():
 
 # --- Run server ---
 if __name__ == "__main__":
+    with app.app_context():
+        create_users()   # ✅ only runs once at startup
     app.run(host="0.0.0.0", port=5000)
