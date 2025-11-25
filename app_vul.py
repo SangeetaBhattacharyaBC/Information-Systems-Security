@@ -56,9 +56,6 @@ def login():
         cur = conn.cursor()
 
         # ❌ VULNERABLE SQL QUERY
-        query = "SELECT * FROM users WHERE username=? AND password=?"
-        result = cur.execute(query, (username, password)).fetchone()
-
         query = f"SELECT * FROM users WHERE username='{username}' AND password='{password}'"
         result = cur.execute(query).fetchone()
 
