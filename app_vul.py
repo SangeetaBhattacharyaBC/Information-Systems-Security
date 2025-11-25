@@ -24,13 +24,23 @@ def init_db():
         )
     """)
 
-    # Insert demo users
     cur.execute("INSERT INTO users (username, password) VALUES ('admin', 'admin123')")
     cur.execute("INSERT INTO users (username, password) VALUES ('bella', 'pass123')")
     conn.commit()
     conn.close()
 
 init_db()
+
+# -----------------------------
+# HOME ROUTE
+# -----------------------------
+@app.route("/")
+def home():
+    return """
+    <h2>Welcome to the Security Demo App</h2>
+    <p><a href='/login'>Login Page (SQL Injection Demo)</a></p>
+    <p><a href='/comment'>Comment Page (XSS Demo)</a></p>
+    """
 
 # -----------------------------
 # 1. SQL INJECTION VULNERABILITY
@@ -55,7 +65,7 @@ def login():
         conn = get_db()
         cur = conn.cursor()
 
-        # ❌ VULNERABLE SQL QUERY
+        # ❌ VULNERABLE QUERY
         query = f"SELECT * FROM users WHERE username='{username}' AND password='{password}'"
         result = cur.execute(query).fetchone()
 
@@ -85,12 +95,9 @@ def comment():
     comment_text = ""
 
     if request.method == "POST":
-        # ❌ STORES RAW UNSAFE INPUT
-        comment_text = request.form['text']
+        comment_text = request.form['text']  # ❌ UNSAFE
 
     return render_template_string(html, comment=comment_text)
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
