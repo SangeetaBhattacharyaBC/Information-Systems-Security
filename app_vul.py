@@ -93,5 +93,4 @@ def comment():
 if __name__ == "__main__":
     app.run(debug=True)
 
-SELECT * FROM users WHERE username='' OR '1'='1' AND password='' OR '1'='1'
 
