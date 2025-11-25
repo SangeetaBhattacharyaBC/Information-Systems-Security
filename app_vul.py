@@ -89,7 +89,7 @@ def comment():
     </form>
 
     <p><strong>Last comment:</strong></p>
-    <div>{{ comment }}</div>
+    <div>{{ comment|safe }}</div>
     """
 
     comment_text = ""
